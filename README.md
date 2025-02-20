@@ -2,7 +2,7 @@
 
 <img src="assets/wolfram-llm-logo.png" width="256" alt="WolframAlpha LLM MCP Logo" />
 
-A Model Context Protocol (MCP) server that provides access to WolframAlpha's LLM API.
+A Model Context Protocol (MCP) server that provides access to WolframAlpha's LLM API. https://products.wolframalpha.com/llm-api/documentation
 
 <div>
   <img src="assets/readme-screen-1.png" width="609" alt="WolframAlpha MCP Server Example 1" /><br/><br/>
