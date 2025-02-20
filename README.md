@@ -3,8 +3,8 @@
 A Model Context Protocol (MCP) server that provides access to WolframAlpha's LLM API.
 
 <p align="center">
-  <img src="assets/readme-screen-1.png" width="800" alt="WolframAlpha MCP Server Example 1" /><br/><br/>
-  <img src="assets/readme-screen-2.png" width="800" alt="WolframAlpha MCP Server Example 2" />
+  <img src="assets/readme-screen-1.png" width="609" alt="WolframAlpha MCP Server Example 1" /><br/><br/>
+  <img src="assets/readme-screen-2.png" width="609" alt="WolframAlpha MCP Server Example 2" />
 </p>
 
 ## Features
