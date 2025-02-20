@@ -26,6 +26,7 @@ A Model Context Protocol (MCP) server that provides access to WolframAlpha's LLM
 ## Installation
 
 ```bash
+git clone https://github.com/Garoth/wolframalpha-llm-mcp.git
 npm install
 ```
 
