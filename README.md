@@ -3,6 +3,7 @@
 <img src="assets/wolfram-llm-logo.png" width="256" alt="WolframAlpha LLM MCP Logo" />
 
 A Model Context Protocol (MCP) server that provides access to WolframAlpha's LLM API. https://products.wolframalpha.com/llm-api/documentation
+<a href="https://smithery.ai/server/@Garoth/wolframalpha-llm-mcp"><img alt="Smithery Badge" src="https://smithery.ai/badge/@Garoth/wolframalpha-llm-mcp"></a>
 
 <div>
   <img src="assets/readme-screen-1.png" width="609" alt="WolframAlpha MCP Server Example 1" /><br/><br/>
@@ -25,6 +26,15 @@ A Model Context Protocol (MCP) server that provides access to WolframAlpha's LLM
 
 ## Installation
 
+### Installing via Smithery
+
+To install WolframAlpha LLM Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@Garoth/wolframalpha-llm-mcp):
+
+```bash
+npx -y @smithery/cli install @Garoth/wolframalpha-llm-mcp --client claude
+```
+
+### Manual Installation
 ```bash
 git clone https://github.com/Garoth/wolframalpha-llm-mcp.git
 npm install
