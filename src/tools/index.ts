@@ -1,5 +1,5 @@
 import { WolframLLMService } from '../services/wolfram-llm.js';
-import { QuestionArgs, EmptyArgs, ToolResponse } from '../types/index.js';
+import { QueryArgs, EmptyArgs, ToolResponse } from '../types/index.js';
 
 // Initialize service
 const wolframLLMService = new WolframLLMService({
@@ -9,19 +9,19 @@ const wolframLLMService = new WolframLLMService({
 export const tools = [
   {
     name: "ask_llm",
-    description: "Ask WolframAlpha a question and get LLM-optimized structured response with multiple formats",
+    description: "Ask WolframAlpha a query and get LLM-optimized structured response with multiple formats",
     inputSchema: {
       type: "object",
       properties: {
-        question: {
+        query: {
           type: "string",
-          description: "The question to ask WolframAlpha"
+          description: "The query to ask WolframAlpha"
         }
       },
-      required: ["question"]
+      required: ["query"]
     },
-    handler: async (args: QuestionArgs): Promise<ToolResponse> => {
-      const response = await wolframLLMService.query(args.question);
+    handler: async (args: QueryArgs): Promise<ToolResponse> => {
+      const response = await wolframLLMService.query(args.query);
       if (!response.success || !response.result) {
         throw new Error(response.error || 'Failed to get LLM response from WolframAlpha');
       }
@@ -55,15 +55,15 @@ export const tools = [
     inputSchema: {
       type: "object",
       properties: {
-        question: {
+        query: {
           type: "string",
-          description: "The question to ask WolframAlpha"
+          description: "The query to ask WolframAlpha"
         }
       },
-      required: ["question"]
+      required: ["query"]
     },
-    handler: async (args: QuestionArgs): Promise<ToolResponse> => {
-      const response = await wolframLLMService.getSimplifiedAnswer(args.question);
+    handler: async (args: QueryArgs): Promise<ToolResponse> => {
+      const response = await wolframLLMService.getSimplifiedAnswer(args.query);
       if (!response.success || !response.result) {
         throw new Error(response.error || 'Failed to get simplified answer from WolframAlpha');
       }

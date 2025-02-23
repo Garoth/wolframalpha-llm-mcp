@@ -121,7 +121,7 @@ describe('WolframLLMService Integration Tests', () => {
       const result = await service.query('xyzabc123 qwerty asdfgh');
 
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Input cannot be interpreted. Try rephrasing your question.');
+      expect(result.error).toBe('Input cannot be interpreted. Try rephrasing your query.');
     });
 
     it('should provide detailed astronomical data about Mars', async () => {

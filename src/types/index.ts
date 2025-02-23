@@ -8,13 +8,13 @@ export interface ToolResponse {
   [key: string]: any; // Allow additional properties for MCP SDK compatibility
 }
 
-export interface QuestionArgs {
-  question: string;
+export interface QueryArgs {
+  query: string;
 }
 
 export interface EmptyArgs {}
 
-export type ToolArgs = QuestionArgs | EmptyArgs;
+export type ToolArgs = QueryArgs | EmptyArgs;
 
 export interface Tool<T = any> {
   name: string;
