@@ -197,7 +197,7 @@ export class WolframLLMService {
   }
 
   /**
-   * Query WolframAlpha's LLM API with a natural language question
+   * Query WolframAlpha's LLM API with a natural language query
    * Returns structured data optimized for LLM consumption
    */
   async query(input: string): Promise<LLMQueryResult> {
@@ -246,7 +246,7 @@ export class WolframLLMService {
       if (axios.isAxiosError(error) && error.response?.status === 501) {
         return {
           success: false,
-          error: 'Input cannot be interpreted. Try rephrasing your question.',
+          error: 'Input cannot be interpreted. Try rephrasing your query.',
           rawResponse
         };
       }

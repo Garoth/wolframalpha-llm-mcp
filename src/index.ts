@@ -12,7 +12,7 @@ import {
   McpError,
 } from "@modelcontextprotocol/sdk/types.js";
 import { tools } from "./tools/index.js";
-import { Tool, ToolResponse, QuestionArgs, EmptyArgs } from "./types/index.js";
+import { Tool, ToolResponse, QueryArgs, EmptyArgs } from "./types/index.js";
 
 // Initialize MCP server
 const server = new Server(
@@ -80,11 +80,11 @@ server.setRequestHandler(CallToolRequestSchema, async (request, _extra) => {
     if (tool.name === 'validate_key') {
       response = await (tool as Tool<EmptyArgs>).handler({});
     } else {
-      // Convert args to QuestionArgs, ensuring question property exists
-      const questionArgs = {
-        question: (args as any).question
-      } as QuestionArgs;
-      response = await (tool as Tool<QuestionArgs>).handler(questionArgs);
+      // Convert args to QueryArgs, ensuring query property exists
+      const queryArgs = {
+        query: (args as any).query
+      } as QueryArgs;
+      response = await (tool as Tool<QueryArgs>).handler(queryArgs);
     }
 
     // Add metadata if provided
