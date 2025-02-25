@@ -51,14 +51,40 @@ export class WolframLLMService {
     // Get all non-query sections
     const nonQuerySections = sections.filter(s => !s.startsWith('Query:'));
     
-    // Put the entire response (except Query) in result
-    result.result = nonQuerySections.join('\n\n').trim();
+    // Simple approach: Just find the second "Assumption:" section and cut everything after it
+    let processedSections = nonQuerySections;
+    
+    // Find the first assumption section
+    const firstAssumptionIndex = nonQuerySections.findIndex(s => s.startsWith('Assumption:'));
+    
+    if (firstAssumptionIndex >= 0) {
+      // Find the second assumption section
+      const secondAssumptionIndex = nonQuerySections.findIndex((s, i) => 
+        i > firstAssumptionIndex && s.startsWith('Assumption:')
+      );
+      
+      // If we found a second assumption section, cut everything after it
+      if (secondAssumptionIndex > 0) {
+        // Keep only the content up to the second assumption
+        processedSections = nonQuerySections.slice(0, secondAssumptionIndex);
+        
+        // Check if there's a URL section after the duplicate content
+        const urlSection = nonQuerySections.find(s => s.startsWith('Wolfram|Alpha website result'));
+        if (urlSection && !processedSections.includes(urlSection)) {
+          processedSections.push(urlSection);
+        }
+      }
+    }
+    
+    // Put the processed response (except Query) in result
+    result.result = processedSections.join('\n\n').trim();
 
     // Process sections
     let currentSection = '';
     let currentContent: string[] = [];
+    const processedSectionTitles = new Set<string>(); // Track section titles to avoid duplicates
 
-    for (const section of nonQuerySections) {
+    for (const section of processedSections) {
       if (section.startsWith('Wolfram|Alpha website result')) {
         const match = section.match(/https:\/\/.*?(?=\s|$)/);
         if (match) {
@@ -70,11 +96,12 @@ export class WolframLLMService {
         
         if (firstLine.includes(':')) {
           // If we have a previous section, save it
-          if (currentSection && currentContent.length > 0) {
+          if (currentSection && currentContent.length > 0 && !processedSectionTitles.has(currentSection)) {
             result.sections.push({
               title: currentSection,
               content: currentContent.join('\n').trim()
             });
+            processedSectionTitles.add(currentSection);
           }
           // Start new section
           currentSection = firstLine.split(':')[0].trim();
@@ -88,7 +115,7 @@ export class WolframLLMService {
     }
 
     // Add the last section if exists
-    if (currentSection && currentContent.length > 0) {
+    if (currentSection && currentContent.length > 0 && !processedSectionTitles.has(currentSection)) {
       result.sections.push({
         title: currentSection,
         content: currentContent.join('\n').trim()
@@ -125,10 +152,35 @@ export class WolframLLMService {
       result.query = JSON.parse(querySection.replace('Query:', '').trim());
     }
 
-     const nonQuerySections = sections.filter(s => !s.startsWith('Query:'));    
+    const nonQuerySections = sections.filter(s => !s.startsWith('Query:'));
+    
+    // Simple approach: Just find the second "Assumption:" section and cut everything after it
+    let processedSections = nonQuerySections;
+    
+    // Find the first assumption section
+    const firstAssumptionIndex = nonQuerySections.findIndex(s => s.startsWith('Assumption:'));
+    
+    if (firstAssumptionIndex >= 0) {
+      // Find the second assumption section
+      const secondAssumptionIndex = nonQuerySections.findIndex((s, i) => 
+        i > firstAssumptionIndex && s.startsWith('Assumption:')
+      );
+      
+      // If we found a second assumption section, cut everything after it
+      if (secondAssumptionIndex > 0) {
+        // Keep only the content up to the second assumption
+        processedSections = nonQuerySections.slice(0, secondAssumptionIndex);
+        
+        // Check if there's a URL section after the duplicate content
+        const urlSection = nonQuerySections.find(s => s.startsWith('Wolfram|Alpha website result'));
+        if (urlSection && !processedSections.includes(urlSection)) {
+          processedSections.push(urlSection);
+        }
+      }
+    }
+    
     // Join all remaining sections and clean up
-    const cleanText = nonQuerySections.join('\n\n').trim();
-    // Take content before first parenthesis if any
+    const cleanText = processedSections.join('\n\n').trim();
     result.result = cleanText;
 
     // Ensure query is present
@@ -236,23 +288,36 @@ export class WolframLLMService {
       // Parse the simplified response
       const result = this.parseSimplifiedResponse(rawResponse);
       
-      // Process sections like in parseQueryResponse
-      const nonQuerySections = rawResponse.split('\n\n').filter(s => !s.startsWith('Query:'));
+      // We already have processed sections from parseSimplifiedResponse
+      // No need to process them again, just use the sections from the result
+      const processedSections = result.result.split('\n\n');
+      
+      // Clear existing sections before processing
+      result.sections = [];
+      
+      // Process sections
       let currentSection = '';
       let currentContent: string[] = [];
+      const processedSectionTitles = new Set<string>(); // Track section titles to avoid duplicates
 
-      for (const section of nonQuerySections) {
-        if (section.trim()) {
+      for (const section of processedSections) {
+        if (section.startsWith('Wolfram|Alpha website result')) {
+          const match = section.match(/https:\/\/.*?(?=\s|$)/);
+          if (match) {
+            result.url = match[0];
+          }
+        } else if (section.trim()) {
           const lines = section.split('\n');
           const firstLine = lines[0];
           
           if (firstLine.includes(':')) {
             // If we have a previous section, save it
-            if (currentSection && currentContent.length > 0) {
+            if (currentSection && currentContent.length > 0 && !processedSectionTitles.has(currentSection)) {
               result.sections.push({
                 title: currentSection,
                 content: currentContent.join('\n').trim()
               });
+              processedSectionTitles.add(currentSection);
             }
             // Start new section, preserving the full title
             currentSection = firstLine.split(':')[0].trim();
@@ -266,10 +331,10 @@ export class WolframLLMService {
       }
 
       // Add the last section if exists
-      if (currentSection && currentContent.length > 0) {
+      if (currentSection && currentContent.length > 0 && !processedSectionTitles.has(currentSection)) {
         result.sections.push({
           title: currentSection,
-          content: currentContent.join('\n')
+          content: currentContent.join('\n').trim()
         });
       }
 

@@ -26,16 +26,37 @@ export const tools = [
         throw new Error(response.error || 'Failed to get LLM response from WolframAlpha');
       }
 
+      // Get the raw result text
+      let rawText = response.result.result;
+      
+      // Find the second "Assumption:" section and remove everything after it
+      const lines = rawText.split('\n\n');
+      const firstAssumptionIndex = lines.findIndex(line => line.startsWith('Assumption:'));
+      
+      let processedLines = lines;
+      if (firstAssumptionIndex >= 0) {
+        const secondAssumptionIndex = lines.findIndex((line, i) => 
+          i > firstAssumptionIndex && line.startsWith('Assumption:')
+        );
+        
+        if (secondAssumptionIndex > 0) {
+          // Keep only the content up to the second assumption
+          processedLines = lines.slice(0, secondAssumptionIndex);
+          
+          // Check if there's a URL section and add it back if needed
+          const urlLine = lines.find(line => line.startsWith('Wolfram|Alpha website result'));
+          if (urlLine && !processedLines.includes(urlLine)) {
+            processedLines.push(urlLine);
+          }
+        }
+      }
+      
+      // Reconstruct the text
       let text = `Query: ${response.result.query}\n`;
       if (response.result.interpretation) {
         text += `Interpretation: ${response.result.interpretation}\n`;
       }
-      text += `\nResult: ${response.result.result}\n`;
-      
-      // Add all sections
-      for (const section of response.result.sections) {
-        text += `\n${section.title}:\n${section.content}\n`;
-      }
+      text += `\nResult: ${processedLines.join('\n\n')}\n`;
       
       if (response.result.url) {
         text += `\nFull results: ${response.result.url}`;
@@ -67,10 +88,38 @@ export const tools = [
       if (!response.success || !response.result) {
         throw new Error(response.error || 'Failed to get simplified answer from WolframAlpha');
       }
+      
+      // Get the raw result text
+      let rawText = response.result.result;
+      
+      // Find the second "Assumption:" section and remove everything after it
+      const lines = rawText.split('\n\n');
+      const firstAssumptionIndex = lines.findIndex(line => line.startsWith('Assumption:'));
+      
+      let processedText = rawText;
+      if (firstAssumptionIndex >= 0) {
+        const secondAssumptionIndex = lines.findIndex((line, i) => 
+          i > firstAssumptionIndex && line.startsWith('Assumption:')
+        );
+        
+        if (secondAssumptionIndex > 0) {
+          // Keep only the content up to the second assumption
+          const processedLines = lines.slice(0, secondAssumptionIndex);
+          
+          // Check if there's a URL section and add it back if needed
+          const urlLine = lines.find(line => line.startsWith('Wolfram|Alpha website result'));
+          if (urlLine && !processedLines.includes(urlLine)) {
+            processedLines.push(urlLine);
+          }
+          
+          processedText = processedLines.join('\n\n');
+        }
+      }
+      
       return {
         content: [{
           type: "text",
-          text: response.result.result
+          text: processedText
         }]
       };
     }
